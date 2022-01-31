@@ -1,0 +1,22 @@
+{
+  "name": "socket-conveyor-client",
+  "version": "1.0.0",
+  "description": "A client for the php package kanata-php/socket-conveyor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kanata-php/socket-conveyor-client.git"
+  },
+  "keywords": [
+    "websocket",
+    "real-time"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kanata-php/socket-conveyor-client/issues"
+  },
+  "homepage": "https://github.com/kanata-php/socket-conveyor-client#readme"
+}

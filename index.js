@@ -31,8 +31,8 @@ class Conveyor {
         }
 
         this.connectToChannel(this.options.channel);
-        this.options.onReady();
         this.addListeners();
+        this.options.onReady();
     }
 
     baseOnMessage(e) {

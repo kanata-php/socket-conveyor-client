@@ -26,26 +26,14 @@ class Conveyor {
     }
 
     onOpen(e) {
-        if (this.options.channel === null) {
-            return;
-        }
-
-        this.connectToChannel(this.options.channel);
+        this.connectChannel();
         this.addListeners();
         this.options.onReady();
     }
 
     baseOnMessage(e) {
         const parsedData = JSON.parse(e.data);
-
         this.options.onMessage(parsedData.data);
-    }
-
-    connectToChannel(channel) {
-        this.ws.send(JSON.stringify({
-            'action': 'channel-connect',
-            'channel': channel,
-        }));
     }
 
     send(message, action) {
@@ -53,9 +41,24 @@ class Conveyor {
             action = 'base-action';
         }
 
-        this.ws.send(JSON.stringify({
+        this.rawSend(JSON.stringify({
             'action': action,
-            'params': {'content': message}
+            'data': message,
+        }));
+    }
+
+    rawSend(message) {
+        this.ws.send(message);
+    }
+
+    connectChannel() {
+        if (this.options.channel === null) {
+            return;
+        }
+
+        this.rawSend(JSON.stringify({
+            'action': 'channel-connect',
+            'channel': this.options.channel,
         }));
     }
 
@@ -72,8 +75,15 @@ class Conveyor {
         this.options.listen.forEach((action) => this.listen(action));
     }
 
+    assocUser(userId) {
+        this.rawSend(JSON.stringify({
+            'action': 'assoc-user-to-fd-action',
+            'userId': userId,
+        }));
+    }
+
     listen(action) {
-        this.ws.send(JSON.stringify({
+        this.rawSend(JSON.stringify({
             'action': 'add-listener',
             'listener': action,
         }));

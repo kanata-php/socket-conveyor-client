@@ -8,6 +8,7 @@ class Conveyor {
                 port: 8000,
                 channel: null,
                 onOpen: this.onOpen.bind(this),
+                onReady: () => {},
                 onMessage: () => {},
                 onClose: () => {},
                 onError: () => {},

@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/kanata-php/socket-conveyor-client/issues"
   },
-  "homepage": "https://github.com/kanata-php/socket-conveyor-client#readme"
+  "homepage": "https://github.com/kanata-php/socket-conveyor-client#readme",
+  "dependencies": {
+    "websocket-reconnect": "^1.0.6"
+  }
 }

@@ -11,10 +11,17 @@ class Conveyor {
                 onMessage: () => {},
                 onClose: () => {},
                 onError: () => {},
+                reconnect: false,
+                reconnectDelay: 5000,
             },
             ...options
         };
-        this.ws = new WebSocket(this.options.protocol + '://' + this.options.uri + ':' + this.options.port);
+        if (this.options.reconnect) {
+            this.ws = new WsReconnect({ reconnectDelay: this.options.reconnectDelay });
+            this.ws.open(this.options.protocol + '://' + this.options.uri + ':' + this.options.port);
+        } else {
+            this.ws = new WebSocket(this.options.protocol + '://' + this.options.uri + ':' + this.options.port);
+        }
         this.bindEvents();
     }
 

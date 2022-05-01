@@ -6,6 +6,7 @@ class Conveyor {
                 protocol: 'ws',
                 uri: '127.0.0.1',
                 port: 8000,
+                query: '',
                 channel: null,
                 onOpen: this.onOpen.bind(this),
                 onReady: () => {},
@@ -19,9 +20,9 @@ class Conveyor {
         };
         if (this.options.reconnect) {
             this.ws = new WsReconnect({ reconnectDelay: this.options.reconnectDelay });
-            this.ws.open(this.options.protocol + '://' + this.options.uri + ':' + this.options.port);
+            this.ws.open(this.options.protocol + '://' + this.options.uri + ':' + this.options.port + this.options.query);
         } else {
-            this.ws = new WebSocket(this.options.protocol + '://' + this.options.uri + ':' + this.options.port);
+            this.ws = new WebSocket(this.options.protocol + '://' + this.options.uri + ':' + this.options.port + this.options.query);
         }
         this.bindEvents();
     }

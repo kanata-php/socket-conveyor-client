@@ -8,9 +8,11 @@ class Conveyor {
                 port: 8000,
                 query: '',
                 channel: null,
+                listen: null,
                 onOpen: this.onOpen.bind(this),
                 onReady: () => {},
-                onMessage: () => {},
+                onMessage: () => {}, // Message handler for only the data portion.
+                onRawMessage: () => {}, // Message handler for the whole incoming object.
                 onClose: () => {},
                 onError: () => {},
                 reconnect: false,
@@ -18,6 +20,7 @@ class Conveyor {
             },
             ...options
         };
+
         if (this.options.reconnect) {
             this.ws = new WsReconnect({ reconnectDelay: this.options.reconnectDelay });
             this.ws.open(this.options.protocol + '://' + this.options.uri + ':' + this.options.port + this.options.query);
@@ -41,6 +44,7 @@ class Conveyor {
     }
 
     baseOnMessage(e) {
+        this.options.onRawMessage(e.data);
         const parsedData = JSON.parse(e.data);
         this.options.onMessage(parsedData.data);
     }
@@ -72,7 +76,7 @@ class Conveyor {
     }
 
     addListeners() {
-        if (typeof this.options.listen === 'undefined') {
+        if (this.options.listen === null) {
             return;
         }
 

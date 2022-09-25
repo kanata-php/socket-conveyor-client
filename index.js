@@ -98,7 +98,7 @@ class Conveyor {
     listen(action) {
         this.rawSend(JSON.stringify({
             'action': 'add-listener',
-            'listener': action,
+            'listen': action,
         }));
     }
 }

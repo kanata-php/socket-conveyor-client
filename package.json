@@ -1,6 +1,6 @@
 {
   "name": "socket-conveyor-client",
-  "version": "1.0.7",
+  "version": "1.2.1",
   "description": "A client for the php package kanata-php/socket-conveyor",
   "main": "index.js",
   "scripts": {
@@ -18,8 +18,5 @@
   "bugs": {
     "url": "https://github.com/kanata-php/socket-conveyor-client/issues"
   },
-  "homepage": "https://github.com/kanata-php/socket-conveyor-client#readme",
-  "dependencies": {
-    "websocket-reconnect": "^1.0.6"
-  }
+  "homepage": "https://github.com/kanata-php/socket-conveyor-client#readme"
 }

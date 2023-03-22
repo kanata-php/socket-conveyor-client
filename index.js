@@ -13,24 +13,39 @@ class Conveyor {
                 onReady: () => {},
                 onMessage: () => {}, // Message handler for only the data portion.
                 onRawMessage: () => {}, // Message handler for the whole incoming object.
-                onClose: () => {},
+                onClose: () => this.onClose.bind(this),
+                onCloseCallback: () => {},
                 onError: () => {},
                 reconnect: false,
                 reconnectDelay: 5000,
+                healthCheckInterval: 3000,
             },
             ...options
         };
 
+        this.start();
+
         if (this.options.reconnect) {
-            this.ws = new WsReconnect({ reconnectDelay: this.options.reconnectDelay });
-            this.ws.open(this.options.protocol + '://' + this.options.uri + ':' + this.options.port + this.options.query);
-        } else {
-            this.ws = new WebSocket(this.options.protocol + '://' + this.options.uri + ':' + this.options.port + this.options.query);
+            this.healthCheckInterval = setInterval(
+                () => this.isClosed() ? this.onClose() : () => {},
+                this.options.healthCheckInterval
+            );
         }
+    }
+
+    isClosed() {
+        return this.ws === null
+            || 2 === this.ws.readyState // closing
+            || 3 === this.ws.readyState // close
+    }
+
+    start() {
+        this.ws = new WebSocket(this.options.protocol + '://' + this.options.uri + ':' + this.options.port + this.options.query);
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.isClosed()) return;
         this.ws.onopen = this.options.onOpen;
         this.ws.onclose = this.options.onClose;
         this.ws.onerror = this.options.onError;
@@ -41,6 +56,13 @@ class Conveyor {
         this.connectChannel();
         this.addListeners();
         this.options.onReady();
+    }
+
+    onClose(e) {
+        this.options.onCloseCallback();
+        if (!this.options.reconnect) return;
+        this.ws = null;
+        setTimeout(() => this.start(), this.options.reconnectDelay);
     }
 
     baseOnMessage(e) {
@@ -61,6 +83,7 @@ class Conveyor {
     }
 
     rawSend(message) {
+        if (this.isClosed()) return;
         this.ws.send(message);
     }
 

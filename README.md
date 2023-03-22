@@ -49,6 +49,7 @@ To use this package, once it is installed, the following example shows how it wo
 </div>
 <script type="module" type="text/javascript">
 
+    // if this connection happens on a bundle, use it like this: import Conveyor from 'socket-conveyor-client';
     import Conveyor from './node_modules/socket-conveyor-client/index.js';
 
     var connection = new Conveyor({
@@ -65,16 +66,44 @@ To use this package, once it is installed, the following example shows how it wo
 </script>
 ```
 
-This package has a few defaults:
-
-```
-protocol: 'ws'
-uri: '127.0.0.1'
-port: 8000
-channel: null
-```
-
 With the previous example your html client will try to connect to `ws://127.0.0.1:8000`. This client will connect to the channel `actions-channel`, and will listen to `example-first-action` actions. That said, any message sent to that **channel** and **action**, will be received at the `OnMessage` callback.
+
+## Options
+
+```
+protocol: 'ws',
+uri: '127.0.0.1',
+port: 8000,
+
+// Url query for connection.
+query: '',
+
+channel: null,
+listen: null,
+onOpen: this.onOpen.bind(this),
+onReady: () => {},
+
+// Message handler for only the data portion.
+onMessage: () => {},
+
+// Message handler for the whole incoming object.
+onRawMessage: () => {},
+
+// Callback triggered when closing connection. If overwritten the reconnection feature can be affected. 
+onClose: () => this.onClose.bind(this),
+
+// Callback for securely do something when connection is closed, without affecting default closing connection behavior.
+onCloseCallback: () => {},
+
+onError: () => {},
+
+// Settings for reconnection feature.
+reconnect: false,
+reconnectDelay: 5000,
+
+// Interval for connection verification, so reconnection action can take place if reconnection active.
+healthCheckInterval: 3000,
+```
 
 ## Author
 

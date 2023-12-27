@@ -95,6 +95,9 @@ onClose: () => this.onClose.bind(this),
 // Callback for securely do something when connection is closed, without affecting default closing connection behavior.
 onCloseCallback: () => {},
 
+// Callback for reconnection feature. Useful if you need to renew a token before attempting again. You might also want to check the method `setOption` for this, so you can change options during this procedure.
+onReconnectCallback: () => {},
+
 onError: () => {},
 
 // Settings for reconnection feature.

@@ -2,54 +2,55 @@
 class Conveyor {
     constructor(options) {
         this.options = {
-            ...{
-                protocol: 'ws',
-                uri: '127.0.0.1',
-                port: 8000,
-                query: '',
-                channel: null,
-                listen: null,
-                onOpen: this.onOpen.bind(this),
-                onReady: () => {},
-                onMessage: () => {}, // Message handler for only the data portion.
-                onRawMessage: () => {}, // Message handler for the whole incoming object.
-                onClose: () => this.onClose.bind(this),
-                onCloseCallback: () => {},
-                onError: () => {},
-                reconnect: false,
-                reconnectDelay: 5000,
-                healthCheckInterval: 3000,
-            },
+            protocol: 'ws',
+            uri: '127.0.0.1',
+            port: 8000,
+            query: '',
+            channel: null,
+            listen: [],
+            onOpen: (e) => this.onOpen(e),
+            onReady: () => {},
+            onMessage: () => {},
+            onRawMessage: () => {},
+            onClose: (e) => this.onClose(e),
+            onCloseCallback: () => {},
+            onError: () => {},
+            reconnect: false,
+            reconnectDelay: 5000,
+            healthCheckInterval: 3000,
             ...options
         };
 
+        this.ws = null;
         this.start();
 
         if (this.options.reconnect) {
-            this.healthCheckInterval = setInterval(
-                () => this.isClosed() ? this.onClose() : () => {},
-                this.options.healthCheckInterval
-            );
+            this.healthCheckInterval = setInterval(() => {
+                if (this.isClosed()) {
+                    this.onClose();
+                }
+            }, this.options.healthCheckInterval);
         }
     }
 
     isClosed() {
-        return this.ws === null
-            || 2 === this.ws.readyState // closing
-            || 3 === this.ws.readyState // close
+        return !this.ws || this.ws.readyState === WebSocket.CLOSED;
     }
 
     start() {
-        this.ws = new WebSocket(this.options.protocol + '://' + this.options.uri + ':' + this.options.port + this.options.query);
+        if (!this.isClosed()) {
+            return;
+        }
+
+        this.ws = new WebSocket(`${this.options.protocol}://${this.options.uri}:${this.options.port}${this.options.query}`);
         this.bindEvents();
     }
 
     bindEvents() {
-        if (this.isClosed()) return;
         this.ws.onopen = this.options.onOpen;
         this.ws.onclose = this.options.onClose;
         this.ws.onerror = this.options.onError;
-        this.ws.onmessage = this.baseOnMessage.bind(this);
+        this.ws.onmessage = (e) => this.baseOnMessage(e);
     }
 
     onOpen(e) {
@@ -59,10 +60,14 @@ class Conveyor {
     }
 
     onClose(e) {
+        if (this.ws) {
+            this.ws = null;
+        }
+
         this.options.onCloseCallback();
-        if (!this.options.reconnect) return;
-        this.ws = null;
-        setTimeout(() => this.start(), this.options.reconnectDelay);
+        if (this.options.reconnect) {
+            setTimeout(() => this.start(), this.options.reconnectDelay);
+        }
     }
 
     baseOnMessage(e) {
@@ -71,19 +76,14 @@ class Conveyor {
         this.options.onMessage(parsedData.data);
     }
 
-    send(message, action) {
-        if (typeof action === 'undefined') {
-            action = 'base-action';
-        }
-
-        this.rawSend(JSON.stringify({
-            'action': action,
-            'data': message,
-        }));
+    send(message, action = 'base-action') {
+        this.rawSend(JSON.stringify({ action, data: message }));
     }
 
     rawSend(message) {
-        if (this.isClosed()) return;
+        if (this.isClosed()) {
+            return;
+        }
         this.ws.send(message);
     }
 
@@ -91,38 +91,23 @@ class Conveyor {
         if (this.options.channel === null) {
             return;
         }
-
-        this.rawSend(JSON.stringify({
-            'action': 'channel-connect',
-            'channel': this.options.channel,
-        }));
+        this.rawSend(JSON.stringify({ action: 'channel-connect', channel: this.options.channel }));
     }
 
     addListeners() {
-        if (this.options.listen === null) {
-            return;
-        }
-
-        if (this.options.listen.constructor !== Array) {
+        if (!Array.isArray(this.options.listen)) {
             console.error('"listen" option must be an array.');
             return;
         }
-
         this.options.listen.forEach((action) => this.listen(action));
     }
 
     assocUser(userId) {
-        this.rawSend(JSON.stringify({
-            'action': 'assoc-user-to-fd-action',
-            'userId': userId,
-        }));
+        this.rawSend(JSON.stringify({ action: 'assoc-user-to-fd-action', userId }));
     }
 
     listen(action) {
-        this.rawSend(JSON.stringify({
-            'action': 'add-listener',
-            'listen': action,
-        }));
+        this.rawSend(JSON.stringify({ action: 'add-listener', listen: action }));
     }
 }
 

@@ -106,6 +106,10 @@ reconnectDelay: 5000,
 
 // Interval for connection verification, so reconnection action can take place if reconnection active.
 healthCheckInterval: 3000,
+
+// Interval for connection heartbeat, so connection can be kept alive.
+heartBeat: true,
+heartBeatInterval: 10000,
 ```
 
 ## Author

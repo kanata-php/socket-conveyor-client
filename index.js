@@ -17,6 +17,8 @@ class Conveyor {
             onError: () => {},
             reconnect: false,
             reconnectDelay: 5000,
+            heartBeat: true,
+            heartBeatInterval: 10000,
             healthCheckInterval: 3000,
             ...options
         };
@@ -56,6 +58,7 @@ class Conveyor {
     onOpen(e) {
         this.connectChannel();
         this.addListeners();
+        this.startHeartBeat();
         this.options.onReady();
     }
 
@@ -108,6 +111,16 @@ class Conveyor {
 
     listen(action) {
         this.rawSend(JSON.stringify({ action: 'add-listener', listen: action }));
+    }
+
+    startHeartBeat() {
+        if (!this.options.heartBeat) {
+            return;
+        }
+
+        this.heartBeatInterval = setInterval(() => {
+            this.ws.ping();
+        }, this.options.heartBeatInterval);
     }
 }
 

@@ -119,7 +119,10 @@ class Conveyor {
         }
 
         this.heartBeatInterval = setInterval(() => {
-            this.ws.ping();
+            const pingFrame = new Uint8Array(2);
+            pingFrame[0] = 0x89;
+            pingFrame[1] = 0x00;
+            this.ws.send(pingFrame);
         }, this.options.heartBeatInterval);
     }
 }

@@ -76,7 +76,7 @@ class Conveyor {
     baseOnMessage(e) {
         this.options.onRawMessage(e.data);
         const parsedData = JSON.parse(e.data);
-        this.options.onMessage(parsedData.data);
+        this.options.onMessage(parsedData.data, parsedData.fd);
     }
 
     send(message, action = 'base-action') {

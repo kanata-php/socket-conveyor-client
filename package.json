@@ -1,6 +1,6 @@
 {
   "name": "socket-conveyor-client",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "A client for the php package kanata-php/socket-conveyor",
   "main": "index.js",
   "scripts": {

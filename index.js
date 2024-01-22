@@ -20,6 +20,7 @@ class Conveyor {
             heartBeat: true,
             heartBeatInterval: 10000,
             healthCheckInterval: 3000,
+            userId: null,
             ...options
         };
 
@@ -56,6 +57,9 @@ class Conveyor {
     }
 
     onOpen(e) {
+        if (this.options.userId !== null) {
+            this.assocUser(this.options.userId);
+        }
         this.connectChannel();
         this.addListeners();
         this.startHeartBeat();

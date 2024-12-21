@@ -21,6 +21,7 @@ class Conveyor {
             heartBeatInterval: 10000,
             healthCheckInterval: 3000,
             userId: null,
+            channelAuth: null,
             ...options
         };
 
@@ -98,7 +99,11 @@ class Conveyor {
         if (this.options.channel === null) {
             return;
         }
-        this.rawSend(JSON.stringify({ action: 'channel-connect', channel: this.options.channel }));
+        this.rawSend(JSON.stringify({
+            action: 'channel-connect',
+            channel: this.options.channel,
+            auth: this.options.channelAuth,
+        }));
     }
 
     addListeners() {

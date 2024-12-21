@@ -110,6 +110,9 @@ healthCheckInterval: 3000,
 // Interval for connection heartbeat, so connection can be kept alive.
 heartBeat: true,
 heartBeatInterval: 10000,
+
+// This is the auth used for laravel-like channel authorization
+channelAuth: null
 ```
 
 ## Author

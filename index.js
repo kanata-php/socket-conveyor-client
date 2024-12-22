@@ -21,11 +21,15 @@ class Conveyor {
             heartBeatInterval: 10000,
             healthCheckInterval: 3000,
             userId: null,
+            acknowledge: false,
             ...options
         };
 
         this.ws = null;
         this.start();
+
+        // Last 20 messages with ack status
+        this.messages = [];
 
         if (this.options.reconnect) {
             this.healthCheckInterval = setInterval(() => {
@@ -84,19 +88,49 @@ class Conveyor {
     }
 
     baseOnMessage(e) {
-        this.options.onRawMessage(e.data);
         const parsedData = JSON.parse(e.data);
+
+        if (this.options.acknowledge) {
+            this.messages.map((message, index) => {
+                if (parsedData.data === message.id) {
+                    this.messages[index].ack = true;
+                }
+            });
+        }
+
+        this.options.onRawMessage(e.data);
         this.options.onMessage(parsedData.data, parsedData.fd);
     }
 
     send(message, action = 'base-action') {
-        this.rawSend(JSON.stringify({ action, data: message }));
+        let data = {
+            action,
+            data: message,
+        };
+
+        if (!this.options.acknowledge) {
+            this.rawSend(JSON.stringify(data));
+            return;
+        }
+
+        data.id = crypto.randomUUID();
+
+        if (this.messages.length >= 20) this.messages.shift();
+
+        this.messages.push({
+            id: data.id,
+            data,
+            ack: false,
+        });
+
+        this.rawSend(JSON.stringify(data));
     }
 
     rawSend(message) {
         if (this.isClosed()) {
             return;
         }
+
         this.ws.send(message);
     }
 
@@ -104,6 +138,7 @@ class Conveyor {
         if (this.options.channel === null) {
             return;
         }
+
         this.rawSend(JSON.stringify({
             action: 'channel-connect',
             channel: this.options.channel,
@@ -112,7 +147,10 @@ class Conveyor {
     }
 
     assocUser(userId) {
-        this.rawSend(JSON.stringify({ action: 'assoc-user-to-fd-action', userId }));
+        this.rawSend(JSON.stringify({
+            action: 'assoc-user-to-fd-action',
+            userId,
+        }));
     }
 
     startHeartBeat() {

@@ -5,6 +5,7 @@ class Conveyor {
             protocol: 'ws',
             uri: '127.0.0.1',
             port: 8000,
+            token: null,
             query: '',
             channel: null,
             listen: [],
@@ -21,7 +22,6 @@ class Conveyor {
             heartBeatInterval: 10000,
             healthCheckInterval: 3000,
             userId: null,
-            channelAuth: null,
             ...options
         };
 
@@ -46,7 +46,14 @@ class Conveyor {
             return;
         }
 
-        this.ws = new WebSocket(`${this.options.protocol}://${this.options.uri}:${this.options.port}${this.options.query}`);
+        let url = `${this.options.protocol}://${this.options.uri}:${this.options.port}`;
+
+        if (this.options.token) url += `?token=${this.options.token}`;
+        if (this.options.token && this.options.query.length > 0) url += `&${this.options.query}`;
+        if (!this.options.token && this.options.query.length > 0) url += `?${this.options.query}`;
+        console.log(url);
+
+        this.ws = new WebSocket(url);
         this.bindEvents();
     }
 

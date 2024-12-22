@@ -75,6 +75,9 @@ protocol: 'ws',
 uri: '127.0.0.1',
 port: 8000,
 
+// This is the auth used for authorization`
+token: null,
+
 // Url query for connection.
 query: '',
 
@@ -110,9 +113,6 @@ healthCheckInterval: 3000,
 // Interval for connection heartbeat, so connection can be kept alive.
 heartBeat: true,
 heartBeatInterval: 10000,
-
-// This is the auth used for laravel-like channel authorization
-channelAuth: null
 ```
 
 ## Author

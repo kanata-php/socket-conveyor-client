@@ -43,8 +43,7 @@ To use this package, once it is installed, the following example shows how it wo
 ```html
 <div>
     <div><button onclick="connection.send('base', 'base-action')">Base Action</button></div>
-    <div><button onclick="connection.send('first', 'example-first-action')">First Action</button></div>
-    <div><button onclick="connection.send('second', 'example-second-action')">Second Action</button></div>
+    <div><button onclick="connection.send('first', 'broadcast-action')">Broadcast Action</button></div>
     <div id="output"></div>
 </div>
 <script type="module" type="text/javascript">
@@ -52,9 +51,10 @@ To use this package, once it is installed, the following example shows how it wo
     // if this connection happens on a bundle, use it like this: import Conveyor from 'socket-conveyor-client';
     import Conveyor from './node_modules/socket-conveyor-client/index.js';
 
-    var connection = new Conveyor({
+    window.connection = new Conveyor({
+        uri: '127.0.0.1',
+        port: 8181,
         channel: 'actions-channel',
-        listen: ['example-first-action'],
         onMessage: (e) => {
             document.getElementById('output').innerHTML = e;
         },
@@ -113,6 +113,12 @@ healthCheckInterval: 3000,
 // Interval for connection heartbeat, so connection can be kept alive.
 heartBeat: true,
 heartBeatInterval: 10000,
+
+// Set the user identifier to be associated with this connection. 
+userId: null,
+
+// Set the client to automatically add id to messages so Conveyor can acknowledge them.
+acknowledge: false,
 ```
 
 ## Author

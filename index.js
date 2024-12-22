@@ -8,7 +8,6 @@ class Conveyor {
             token: null,
             query: '',
             channel: null,
-            listen: [],
             onOpen: (e) => this.onOpen(e),
             onReady: () => {},
             onMessage: () => {},
@@ -69,7 +68,6 @@ class Conveyor {
             this.assocUser(this.options.userId);
         }
         this.connectChannel();
-        this.addListeners();
         this.startHeartBeat();
         this.options.onReady();
     }
@@ -109,24 +107,12 @@ class Conveyor {
         this.rawSend(JSON.stringify({
             action: 'channel-connect',
             channel: this.options.channel,
-            auth: this.options.channelAuth,
+            auth: this.options.token,
         }));
-    }
-
-    addListeners() {
-        if (!Array.isArray(this.options.listen)) {
-            console.error('"listen" option must be an array.');
-            return;
-        }
-        this.options.listen.forEach((action) => this.listen(action));
     }
 
     assocUser(userId) {
         this.rawSend(JSON.stringify({ action: 'assoc-user-to-fd-action', userId }));
-    }
-
-    listen(action) {
-        this.rawSend(JSON.stringify({ action: 'add-listener', listen: action }));
     }
 
     startHeartBeat() {
